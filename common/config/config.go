@@ -11,7 +11,7 @@ import (
 var Conf *Config
 
 type Config struct {
-	Log        LogConf                 `mapstructure:"log"`
+	Log        LogConf                 `mapstructure:"logs"`
 	Port       int                     `mapstructure:"port"`
 	WsPort     int                     `mapstructure:"wsPort"`
 	MetricPort int                     `mapstructure:"metricPort"`
