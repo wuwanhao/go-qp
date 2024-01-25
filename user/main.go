@@ -13,8 +13,6 @@ import (
 var configFile = flag.String("config", "application.yml", "config file")
 
 func main() {
-	// 做一个日志库
-	// etcd注册中心，grpc服务注册到etcd中，客户端访问的时候，通过etcd获取grpc的地址
 
 	// 1.加载配置文件
 	flag.Parse()

@@ -63,6 +63,8 @@ type RedisConf struct {
 	Host         string   `mapstructure:"host"`
 	Port         int      `mapstructure:"port"`
 }
+
+// etcd相关配置
 type EtcdConf struct {
 	Addrs       []string       `mapstructure:"addrs"`
 	RWTimeout   int            `mapstructure:"rwTimeout"`

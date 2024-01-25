@@ -2,6 +2,7 @@ package app
 
 import (
 	"common/config"
+	"common/discovery"
 	"common/logs"
 	"context"
 	"google.golang.org/grpc"
@@ -16,7 +17,12 @@ import (
 // Run 启动程序
 func Run(ctx context.Context) error {
 
+	//1. 初始化日志库
 	logs.InitLog(config.Conf.AppName)
+
+	//2. etcd注册中心，grpc服务注册到etcd中，客户端访问的时候，通过etcd获取grpc的地址
+	register := discovery.NewRegister()
+
 
 	// 协程启动gRPC服务端
 	server := grpc.NewServer()
@@ -25,6 +31,12 @@ func Run(ctx context.Context) error {
 		if err != nil {
 			logs.Fatal("==> user grpc server listen error:%v", err)
 		}
+		// 启动成功之后，注册到etcd
+		err = register.Register(config.Conf.Etcd)
+		if err != nil {
+			logs.Fatal("==> user grpc server register etcd error:%v", err)
+		}
+
 		if err = server.Serve(listen); err != nil {
 			logs.Fatal("==> user grpc server run failed error:%v", err)
 		}
