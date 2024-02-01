@@ -17,21 +17,21 @@ import (
 // Run 启动程序
 func Run(ctx context.Context) error {
 
-	//1. 初始化日志库
+	// 1.初始化日志库
 	logs.InitLog(config.Conf.AppName)
 
-	//2. etcd注册中心，grpc服务注册到etcd中，客户端访问的时候，通过etcd获取grpc的地址
+	// 2.获取etcd注册客户端实例
 	register := discovery.NewRegister()
 
 
-	// 协程启动gRPC服务端
+	// 3.协程启动gRPC服务端
 	server := grpc.NewServer()
 	go func() {
 		listen, err := net.Listen("tcp", config.Conf.Grpc.Addr)
 		if err != nil {
 			logs.Fatal("==> user grpc server listen error:%v", err)
 		}
-		// 启动成功之后，注册到etcd
+		// 4.启动成功之后，注册到etcd
 		err = register.Register(config.Conf.Etcd)
 		if err != nil {
 			logs.Fatal("==> user grpc server register etcd error:%v", err)
@@ -45,6 +45,7 @@ func Run(ctx context.Context) error {
 	// 优雅启停，遇到 终止 退出 中断 挂断信号，则结束gRPC server的运行
 	stop := func() {
 		server.Stop()
+		register.Close() // 服务停止，同时也要关闭与etcd的连接
 		time.Sleep(3 * time.Second) // 休眠3S，停止必要的服务
 		logs.Info("==> stop app finish")
 	}
