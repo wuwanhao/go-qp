@@ -5,6 +5,7 @@ import (
 	"common/discovery"
 	"common/logs"
 	"context"
+	"core/repo"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -23,9 +24,10 @@ func Run(ctx context.Context) error {
 	// 2.获取etcd注册客户端实例
 	register := discovery.NewRegister()
 
-
 	// 3.协程启动gRPC服务端
 	server := grpc.NewServer()
+	// 4.初始化数据库管理
+	manager := repo.New()
 	go func() {
 		listen, err := net.Listen("tcp", config.Conf.Grpc.Addr)
 		if err != nil {
@@ -37,15 +39,21 @@ func Run(ctx context.Context) error {
 			logs.Fatal("==> user grpc server register etcd error:%v", err)
 		}
 
+		// 注册 grpc service  需要MongoDB  redis
+
+
 		if err = server.Serve(listen); err != nil {
 			logs.Fatal("==> user grpc server run failed error:%v", err)
 		}
 	}()
 
+
+
 	// 优雅启停，遇到 终止 退出 中断 挂断信号，则结束gRPC server的运行
 	stop := func() {
 		server.Stop()
 		register.Close() // 服务停止，同时也要关闭与etcd的连接
+		manager.Close() // 关闭所有的数据库连接
 		time.Sleep(3 * time.Second) // 休眠3S，停止必要的服务
 		logs.Info("==> stop app finish")
 	}

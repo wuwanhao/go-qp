@@ -5,6 +5,7 @@ import (
 	"common/logs"
 	"context"
 	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 type RedisManager struct {
@@ -49,4 +50,30 @@ func NewRedis() *RedisManager {
 		ClusterCi: clusterCli,
 		Cli:       cli,
 	}
+}
+
+// 关闭redis连接
+func (r *RedisManager)Close()  {
+	if r.ClusterCi != nil {
+		if err := r.ClusterCi.Close(); err != nil {
+			logs.Error("redis cluster close err: %v", err)
+		}
+	}
+	if r.Cli != nil {
+		if err := r.Cli.Close(); err != nil {
+			logs.Error("redis close err: %v", err)
+		}
+	}
+}
+
+// 封装Set
+func (r *RedisManager) Set(ctx context.Context, key, value string, expire time.Duration) error {
+	if r.ClusterCi != nil {
+		return r.ClusterCi.Set(ctx, key, value, expire).Err()
+	}
+
+	if r.Cli != nil {
+		return r.Cli.Set(ctx, key, value, expire).Err()
+	}
+	return nil
 }
