@@ -1,5 +1,6 @@
 httpPort: 13000
 metricPort: 5855
+## 网关服务
 appName: gate
 log:
   level: DEBUG

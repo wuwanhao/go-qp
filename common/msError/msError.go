@@ -28,11 +28,11 @@ func GrpcError(err *Error) error {
 }
 
 func ParseGrpcError(err Error) (int, string) {
-	fromError, _ := status.FromError(err)
+	fromError, _ := status.FromError(&err)
 	return int(fromError.Code()), fromError.Message()
 }
 
 func ToError(err error) *Error {
 	fromError, _ := status.FromError(err)
-	return NewError(int(fromError.Code(), errors.New(fromError.Message())))
+	return NewError(int(fromError.Code()), errors.New(fromError.Message()))
 }

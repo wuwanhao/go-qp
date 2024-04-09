@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Serve 可视化实时监控 /debug/statsviz
+// Serve 可视化实时监控  /debug/statsviz
 func Serve(addr string) error {
 	mux := http.NewServeMux()
 	err := statsviz.Register(mux)

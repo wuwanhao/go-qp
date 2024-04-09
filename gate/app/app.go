@@ -20,7 +20,7 @@ func Run(ctx context.Context) error {
 	logs.InitLog(config.Conf.AppName)
 
 	go func() {
-		// gin注册路由，启动
+		// 启动gin，然后注册路由
 		r := router.RegisterRouter()
 		if err := r.Run(fmt.Sprintf(":%d", config.Conf.HttpPort));err != nil {
 			logs.Error("[gin] gate run error:%v", err)
@@ -33,6 +33,8 @@ func Run(ctx context.Context) error {
 		time.Sleep(3 * time.Second) // 休眠3S，停止必要的服务
 		logs.Info("==> stop app finish")
 	}
+
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGHUP)
 	for {

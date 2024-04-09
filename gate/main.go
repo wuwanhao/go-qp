@@ -24,7 +24,7 @@ func main() {
 			panic(err)
 		}
 	}()
-	// 3.启动grpc服务端
+	// 3.启动user的服务端
 	err := app.Run(context.Background())
 	if err != nil {
 		log.Println(err)
