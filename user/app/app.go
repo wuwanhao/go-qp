@@ -16,7 +16,7 @@ import (
 	"user/pb"
 )
 
-// Run 启动程序  启动grpc服务  启动http服务  加载日志  启动数据库连接
+// Run 启动程序
 func Run(ctx context.Context) error {
 
 	// 1.初始化日志库
@@ -35,13 +35,13 @@ func Run(ctx context.Context) error {
 		if err != nil {
 			logs.Fatal("==> user grpc server listen error: %v", err)
 		}
-		// 启动成功之后，注册到etcd
+		// 4.1 启动成功之后，将该gRPC服务注册到etcd
 		err = register.Register(config.Conf.Etcd)
 		if err != nil {
 			logs.Fatal("==> user grpc server register etcd error: %v", err)
 		}
 
-		// 注册 grpc service  需要MongoDB  redis
+		// 4.2 注册 account service到grpc
 		pb.RegisterUserServiceServer(server, service.NewAccountService(manager))
 
 		if err = server.Serve(listen); err != nil {

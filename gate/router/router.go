@@ -2,6 +2,7 @@ package router
 
 import (
 	"common/config"
+	"common/rpc"
 	"gate/api"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,9 @@ func RegisterRouter() *gin.Engine{
 	}
 
 	// 初始化grpc client，gate作为grpc客户端去调用user-grpc服务
+	rpc.Init()
+
+	// 初始化gin引擎
 	r := gin.Default()
 	userHandler := api.NewUserHandler()
 	r.POST("/register", userHandler.Register)
