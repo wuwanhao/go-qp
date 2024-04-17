@@ -16,7 +16,6 @@ type Server struct {
 	Ttl     int64  `json:"ttl"`
 }
 
-
 // 创建注册key
 func (s Server) BuildRegisterKey() string {
 	// 如果服务没有版本 (Version)，则注册键为 "/服务名称/服务地址"。
@@ -27,6 +26,7 @@ func (s Server) BuildRegisterKey() string {
 	return fmt.Sprintf("/%s/%s/%s", s.Name, s.Version, s.Addr)
 }
 
+// 通过Value获取Server
 func ParseValue(val []byte) (Server, error) {
 	server := Server{}
 	if err := json.Unmarshal(val, &server); err != nil {
@@ -35,7 +35,10 @@ func ParseValue(val []byte) (Server, error) {
 	return server, nil
 }
 
+// 通过Key获取Server
 func ParseKey(key string) (Server, error) {
+
+	// user/v1/127.0.0.1:12000
 	strs := strings.Split(key, "/")
 	if len(strs) == 2 {
 		// no version
@@ -49,8 +52,8 @@ func ParseKey(key string) (Server, error) {
 		// has version
 		return Server{
 			Name:    strs[0],
-			Addr:    strs[1],
-			Version: strs[2],
+			Version: strs[1],
+			Addr:    strs[2],
 		}, nil
 	}
 

@@ -6,9 +6,11 @@ import (
 	"common/logs"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/resolver"
 	"user/pb"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/resolver"
 )
 
 var (
@@ -28,8 +30,12 @@ func Init() {
 func initClient(name string, loadBalance bool, client interface{}) {
 	// 找服务的地址
 	addr := fmt.Sprintf("etcd:///%s", name)
-
-
+	// 配置从服务列表中选择服务时的负载均衡策略：轮询
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials())}
+	if loadBalance {
+		opts = append(opts, grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, "round_robin")))
+	}
 	conn, err := grpc.DialContext(context.TODO(), addr)
 	if err != nil {
 		logs.Fatal("rpc connect etcd error: %v", err)
